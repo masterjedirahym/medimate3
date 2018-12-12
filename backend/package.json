@@ -8,8 +8,8 @@
     "feathers"
   ],
   "author": {
-    "name": "masterjedirahym",
-    "email": "rahym2498@gmail.com"
+    "name": "",
+    "email": ""
   },
   "contributors": [],
   "bugs": {},
@@ -38,13 +38,13 @@
     "cors": "^2.8.5",
     "feathers-knex": "^4.0.0",
     "helmet": "^3.15.0",
-    "knex": "^0.16.2",
+    "knex": "^0.15.2",
     "serve-favicon": "^2.5.0",
-    "sqlite": "^3.0.0",
+    "sqlite3": "^4.0.4",
     "winston": "^3.1.0"
   },
   "devDependencies": {
-    "eslint": "^5.9.0",
+    "eslint": "^5.10.0",
     "jest": "^23.6.0",
     "nodemon": "^1.18.8",
     "request": "^2.88.0",
