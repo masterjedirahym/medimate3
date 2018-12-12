@@ -8,8 +8,8 @@
     "feathers"
   ],
   "author": {
-    "name": "Morgan Benton",
-    "email": "morgan.benton@gmail.com"
+    "name": "masterjedirahym",
+    "email": "rahym2498@gmail.com"
   },
   "contributors": [],
   "bugs": {},
@@ -22,11 +22,11 @@
     "npm": ">= 3.0.0"
   },
   "scripts": {
-    "test": "npm run eslint && NODE_ENV= npm run mocha",
+    "test": "npm run eslint && NODE_ENV= npm run jest",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "dev": "nodemon src/",
     "start": "node src/",
-    "mocha": "mocha test/ --recursive --exit"
+    "jest": "jest"
   },
   "dependencies": {
     "@feathersjs/configuration": "^2.0.4",
@@ -37,17 +37,16 @@
     "compression": "^1.7.3",
     "cors": "^2.8.5",
     "feathers-knex": "^4.0.0",
-    "helmet": "^3.14.0",
-    "knex": "^0.15.2",
+    "helmet": "^3.15.0",
+    "knex": "^0.16.2",
     "serve-favicon": "^2.5.0",
     "sqlite": "^3.0.0",
-    "sqlite3": "^4.0.4",
     "winston": "^3.1.0"
   },
   "devDependencies": {
-    "eslint": "^5.8.0",
-    "mocha": "^5.2.0",
-    "nodemon": "^1.18.7",
+    "eslint": "^5.9.0",
+    "jest": "^23.6.0",
+    "nodemon": "^1.18.8",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   }
