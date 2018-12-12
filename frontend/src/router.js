@@ -2,15 +2,12 @@ import Vue        from "vue";
 import Router     from "vue-router";
 import Home       from "@/views/Home.vue";
 import About      from "@/views/About.vue";
-import Courses    from "@/views/courses/Courses.vue";
-import Course     from "@/views/courses/Course.vue";
-import NewCourse  from "@/views/courses/NewCourse.vue";
-import Students   from "@/views/students/Students.vue";
-import Student    from "@/views/students/Student.vue";
-import NewStudent from "@/views/students/NewStudent.vue";
-import Subjects   from "@/views/subjects/Subjects.vue";
-import Subject    from "@/views/subjects/Subject.vue";
-import NewSubject from "@/views/subjects/NewSubject.vue";
+import Doctors    from "@/views/doctors/Doctors.vue";
+import Doctor     from "@/views/doctors/Doctor.vue";
+import NewDoctor  from "@/views/doctors/NewDoctor.vue";
+import Patients   from "@/views/patients/Patients.vue";
+import Patient    from "@/views/patients/Patient.vue";
+import NewPatient from "@/views/patients/NewPatient.vue";
 
 Vue.use(Router);
 
@@ -39,9 +36,9 @@ export default new Router({
       }
     },
     {
-      path: "/courses",
-      name: "courses",
-      component: Courses,
+      path: "/doctors",
+      name: "doctors",
+      component: Doctors,
       meta: {
         icon: "school",
         breadcrumbs: [
@@ -50,31 +47,31 @@ export default new Router({
       }
     },
     {
-      path: "/courses/new",
-      name: "new-course",
-      component: NewCourse,
+      path: "/doctors/new",
+      name: "new-doctor",
+      component: NewDoctor,
       meta: {
         breadcrumbs: [
           { text: "Home", href: "/" },
-          { text: "Courses", href: "/courses" }
+          { text: "Doctors", href: "/doctors" }
         ]
       }
     },
     {
-      path: "/courses/:id",
-      name: "course",
-      component: Course,
+      path: "/doctors/:id",
+      name: "doctor",
+      component: Doctor,
       meta: {
         breadcrumbs: [
           { text: "Home", href: "/" },
-          { text: "Courses", href: "/courses" }
+          { text: "Doctors", href: "/doctors" }
         ]
       }
     },
     {
-      path: "/students",
-      name: "students",
-      component: Students,
+      path: "/patients",
+      name: "patients",
+      component: Patients,
       meta: {
         icon: "group",
         breadcrumbs: [
@@ -83,59 +80,26 @@ export default new Router({
       }
     },
     {
-      path: "/students/new",
-      name: "new-student",
-      component: NewStudent,
+      path: "/patients/new",
+      name: "new-patient",
+      component: NewPatient,
       meta: {
         breadcrumbs: [
           { text: "Home", href: "/" },
-          { text: "Students", href: "/students" }
+          { text: "Patients", href: "/patients" }
         ]
       }
     },
     {
-      path: "/students/:id",
-      name: "student",
-      component: Student,
+      path: "/patients/:id",
+      name: "patient",
+      component: Patient,
       meta: {
         breadcrumbs: [
           { text: "Home", href: "/" },
-          { text: "Students", href: "/students" }
+          { text: "Patients", href: "/patients" }
         ]
       }
     },
-    {
-      path: "/subjects",
-      name: "subjects",
-      component: Subjects,
-      meta: {
-        icon: "subject",
-        breadcrumbs: [
-          { text: "Home", href: "/" }
-        ]
-      }
-    },
-    {
-      path: "/subjects/new",
-      name: "new-subject",
-      component: NewSubject,
-      meta: {
-        breadcrumbs: [
-          { text: "Home", href: "/" },
-          { text: "Subjects", href: "/subjects" }
-        ]
-      }
-    },
-    {
-      path: "/subjects/:id",
-      name: "subject",
-      component: Subject,
-      meta: {
-        breadcrumbs: [
-          { text: "Home", href: "/" },
-          { text: "Subjects", href: "/subjects" }
-        ]
-      }
-    }
   ]
 });

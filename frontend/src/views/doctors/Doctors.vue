@@ -1,9 +1,6 @@
 <template>
   <div class="container page">
-    <!-- <v-breadcrumbs :items="breadcrumbs">
-      <v-icon slot="divider">chevron_right</v-icon>
-    </v-breadcrumbs> -->
-    <h1>Subjects</h1>
+    <h1>Doctors</h1>
     <v-alert
       v-if="alert"
       v-model="alert"
@@ -14,22 +11,23 @@
       {{ alert.message }}
     </v-alert>
     <p>
-      <v-btn large color="secondary" :to="'/subjects/new'">
+      <v-btn large color="secondary" :to="'/doctors/new'">
         <v-icon left dark>add</v-icon>
-        Add New Subject
+        Add New Doctor
       </v-btn>
     </p>
     <v-card>
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="subjects.data"
+        :items="doctors.data"
         item-key="id"
+        :total-items="doctors.total"
         select-all
-        :total-items="subjects.total"
         :pagination.sync="pagination"
         :rows-per-page-items="rowsPerPageItems"
-        must-sort>
+        must-sort
+      >
         <template slot="items" slot-scope="props">
           <tr :active="props.selected" @click="props.selected = !props.selected">
             <td>
@@ -40,10 +38,11 @@
               ></v-checkbox>
             </td>
             <td>
-              <router-link :to="`/subjects/${props.item.id}`">
-                {{ props.item.code }}
+              <router-link :to="`/doctors/${props.item.id}`">
+                {{ props.item.email }}
               </router-link>
             </td>
+            <td>{{ props.item.password }}</td>
           </tr>
         </template>
       </v-data-table>
@@ -51,13 +50,13 @@
         <v-layout row justify-space-around align-top>
           <v-flex xs5>
             <v-select
-              v-model="course"
+              v-model="patient"
               class="item"
-              label="Pick a Course"
-              item-text="code"
+              label="Pick a Patient"
+              item-text="name"
               item-value="id"
               item-key="id"
-              :items="courses"
+              :items="patients"
               solo
               clearable
             ></v-select>
@@ -66,9 +65,9 @@
             <v-btn
               class="secondary item"
               large block
-              :disabled="allowCourseAssociation"
-              @click="associateSubjectsWithCourse"
-            >Add Selected Subjects to Course</v-btn>
+              :disabled="allowPatientAssociation"
+              @click="associateDoctorsWithPatient"
+            >Add Selected Doctors to Patient</v-btn>
           </v-flex>
         </v-layout>
       </v-container>
@@ -77,46 +76,39 @@
 </template>
 
 <script>
-import { getSubjects } from "@/services/subjects";
-import { getCourses, updateCourse } from "@/services/courses";
+import { getDoctors } from "@/services/doctors";
+import { getPatients, updatePatient } from "@/services/patients";
 export default {
-  name: "Subjects",
+  name: "Doctors",
   data: () => ({
-    subjects: {
+    doctors: {
       total: 0,
       data: []
     },
     selected: [],
-    course: null,
+    patient: null,
     rowsPerPageItems: [10, 25, 50],
     pagination: {
       descending: false,
       page: 1,
       rowsPerPage: 10,
-      sortBy: "code",
+      sortBy: "email",
       totalItems: 0
     },
     headers: [
       {
-        text: "Code",
-        value: "code"
+        text: "Email",
+        value: "email"
+      },
+      {
+        text: "Password",
+        value: "password"
       }
     ],
     alert: null
   }),
-  // computed: {
-  //   breadcrumbs() {
-  //     let breadcrumbs = this.$route.meta.breadcrumbs;
-  //     breadcrumbs.push({
-  //       text: this.$route.name,
-  //       href: this.$route.path
-  //     });
-  //     console.log(breadcrumbs);
-  //     return breadcrumbs;
-  //   }
-  // },
   asyncComputed: {
-    subjects: {
+    doctors: {
       async get() {
         let query = {
           $limit: this.pagination.rowsPerPage,
@@ -125,41 +117,44 @@ export default {
             [this.pagination.sortBy]:  this.pagination.descending ? -1 : 1
           }
         };
-        return await getSubjects({ query });
+        return await getDoctors({ query });
       },
       default: {
         total: 0,
         data: []
       }
     },
-    courses: {
+    patients: {
       async get() {
-        let c = await getCourses({query:{$limit: 50, $sort:{code: 1}}});
-        return c.data;
+        let patis = await getPatients({query:{$limit: 50, $sort:{last_name: 1}}});
+        patis = patis.data.map(s => Object.assign(s, {name: `${s.first_name} ${s.last_name}`}));
+        return patis;
       },
       default: []
-    }
-  },
+    },
+  },  
   computed: {
-    allowCourseAssociation() {
-      return !this.course || this.selected.length == 0;
+    allowPatientAssociation() {
+      return !this.patient || this.selected.length == 0;
     }
   },
   methods: {
-    async associateSubjectsWithCourse() {
-      let crs = this.courses.filter(s => s.id === this.course)[0];
-      crs.subjects = this.selected.map(c => c.id);
+    async associateDoctorsWithPatient() {
+      let pati = this.patients.filter(s => s.id === this.patient)[0];
+      pati.doctors = this.selected.map(c => c.id);
+      // remove the temporary "name" field
+      delete pati.name;
       let res;
       try {
-        res = await updateCourse(crs.id, crs);
+        res = await updatePatient(pati.id, pati);
         res = {
           status: 'success',
-          message: `Success! Selected subjects(s) added to ${res.code}!`
+          message: `Success! Selected doctor(s) added to ${res.first_name}'s profile!`
         };
       } catch(err) {
         res = err;
       }
-      this.alert = res;
+      this.alert = res;      
     }
   },
   async mounted() {

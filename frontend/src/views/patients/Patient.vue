@@ -1,6 +1,6 @@
 <template>
   <div class="container page">
-    <h1>Add a New Student</h1>
+    <h1>{{ name }}</h1>
     <v-alert
       v-if="apiError"
       v-model="apiError"
@@ -8,11 +8,11 @@
       type="warning"
       transition="fade-transition"
     >
-      {{ apiError.code }} {{ apiError.name }}: {{ apiError.message }}
+      {{ apiError.email }} {{ apiError.name }}: {{ apiError.message }}
     </v-alert>
     <form>
       <v-text-field
-        v-model="student.first_name"
+        v-model="patient.first_name"
         v-validate="'required'"
         :error-messages="errors.collect('first_name')"
         label="First Name*"
@@ -20,14 +20,14 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="student.middle_initial"
+        v-model="patient.middle_initial"
         v-validate="{ max: 1, regex: /[A-Z]/ }"
         :error-messages="errors.collect('middle_initial')"
         label="Middle Initial"
         data-vv-name="middle_initial"
       ></v-text-field>
       <v-text-field
-        v-model="student.last_name"
+        v-model="patient.last_name"
         v-validate="'required'"
         :error-messages="errors.collect('last_name')"
         label="Last Name*"
@@ -35,7 +35,7 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="student.ssn"
+        v-model="patient.ssn"
         :append-icon="show_ssn ? 'visibility_off' : 'visibility'"
         v-validate="{ required: true, regex: /\d{9}/ }"
         :type="show_ssn ? 'text' : 'password'"
@@ -49,7 +49,7 @@
       <v-dialog
         ref="dialog"
         v-model="modal"
-        :return-value.sync="student.dob"
+        :return-value.sync="patient.dob"
         persistent
         lazy
         full-width
@@ -57,19 +57,19 @@
       >
         <v-text-field
           slot="activator"
-          v-model="student.dob"
+          v-model="patient.dob"
           label="Birth Date"
           prepend-icon="event"
           readonly
         ></v-text-field>
-        <v-date-picker v-model="student.dob" scrollable>
+        <v-date-picker v-model="patient.dob" scrollable>
           <v-spacer></v-spacer>
           <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
-          <v-btn flat color="primary" @click="$refs.dialog.save(student.dob)">OK</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog.save(patient.dob)">OK</v-btn>
         </v-date-picker>
       </v-dialog>
       <v-text-field
-        v-model="student.address"
+        v-model="patient.address"
         v-validate="'required'"
         :error-messages="errors.collect('address')"
         label="Address (e.g. Street, City, State)*"
@@ -77,7 +77,7 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="student.zip"
+        v-model="patient.zip"
         v-validate="{ required: true, regex: /\d{5}/ }"
         :counter="5"
         :error-messages="errors.collect('zip')"
@@ -86,7 +86,7 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="student.phone"
+        v-model="patient.phone"
         v-validate="{ required: true, regex:/\d{10}/ }"
         :counter="10"
         mask="phone"
@@ -96,34 +96,54 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="student.gender"
+        v-model="patient.gender"
         label="Gender"
       ></v-text-field>
-      <v-btn @click="submit" class="secondary">Submit</v-btn>
+      <v-btn :disabled="!edited" @click="submit" class="secondary">Submit</v-btn>
     </form>
+    <v-layout row mt-4>
+      <v-flex xs12 sm6>
+        <v-card>
+          <v-toolbar color="secondary" dark>
+            <v-toolbar-title>Doctors</v-toolbar-title>
+          </v-toolbar>
+          <v-list two-line>
+            <template v-for="doctor in patient.doctors">
+              <v-list-tile
+                :key="doctor.id"
+                avatar
+                @click="$router.push('/doctors/' + doctor.id)"
+              >
+                <v-list-tile-avatar>
+                  <v-icon>school</v-icon>
+                </v-list-tile-avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title v-html="doctor.email"></v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-divider :key="doctor.id + 'd'"></v-divider>
+            </template>
+          </v-list>
+        </v-card>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
 <script>
 // import the necessary database service functions
-import { addStudent } from "@/services/students";
-// configure the Student component (i.e. this page)
+import { getPatient, updatePatient } from "@/services/patients";
+// configure the Patient component (i.e. this page)
 export default {
-  name: "NewStudent",
+  name: "Patient",
   // variables defined for use in our template
   data: () => ({
-    // the 'student' is a default blank student object that
+    // the 'patient' is a default blank patient object that
     // receive the values in the form so we can create a 
-    // new student in the database
-    student: {
+    // new patient in the database
+    patient: {
       first_name: "",
-      middle_initial: "",
       last_name: "",
-      ssn: "",
-      dob: "1998-01-01",
-      address: "",
-      zip: "",
-      phone: "",
       gender: ""
     },
     // controls default visibility for the SSN field and date picker
@@ -140,70 +160,51 @@ export default {
       // string to refer to the form field in error messages
       attributes: {
         first_name: "First Name",
-        middle_initial: "Middle Initial",
         last_name: "Last Name",
-        ssn: "Social Security Number",
-        dob: "Birth Date",
-        address: "Address",
-        zip: "Zip Code",
-        phone: "Phone Number",
         gender: "Gender"
       },
-      // the 'custom' property is where we define custom error
-      // messages; most of the time this is not strictly
-      // necessary as Vee Validate comes with useful default
-      // error messages out of the box.
-      custom: {
-        ssn: {
-          regex: () => {
-            return (
-              `The Social Security Number must be exactly 9 digits without dashes.`
-            );
-          }
-        },
-        zip: {
-          regex: () => {
-            return (
-              `The Zip Code must be exactly 5 digits.`
-            );
-          }
-        },
-        phone: {
-          regex: () => {
-            return (
-              `The Phone Number must be exactly 10 digits without other characters.`
-            );
-          }
-        },
-      }
     }
   }),
+  computed: {
+    edited() {
+      return Object.keys(this.fields).some(key => this.fields[key].dirty);
+    },
+    name() {
+      return `${this.patient.first_name} ${mi}${this.patient.last_name}`;
+    }
+  },
   methods: {
     async submit() {
       // validate the form
       const valid = await this.$validator.validateAll();
       // if everthing is okay...
       if (valid) {
-        try { // try to add the student to the database
-          const student = await addStudent(this.student);
-          // then redirect back to the Students page with
+        try { // try to update the patient in the database
+          const patient = await updatePatient(this.patient.id, this.patient);
+          // then redirect back to the Patients page with
           // a success message
           this.$router.replace({
-            name: "students",
+            name: "patients",
             query: {
               status: "success",
-              message: `Success! The student ${student.first_name} ` +
-                `${student.last_name} has been added!`
+              message: `Success! The patient ${patient.first_name} ` +
+                `${patient.last_name} has been updated!`
             }
           });
         } catch(err) {
-          // uh-oh! there was a problem updating the student
+          // uh-oh! there was a problem updating the patient
           this.apiError = err;
         }
       }
     }
   },
   async mounted() {
+    // load the patient
+    try {
+      this.patient = await getPatient(this.$route.params.id);
+    } catch(err) {
+      this.apiError = err;
+    }
     // tell Vee Validate to use our custom dictionary
     this.$validator.localize("en", this.dictionary);
   },

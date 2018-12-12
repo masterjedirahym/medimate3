@@ -1,6 +1,6 @@
 <template>
   <div class="container page">
-    <h1>{{ course.code }}: {{ course.title }}</h1>
+    <h1>{{ doctor.email }}: {{ doctor.password }}</h1>
     <v-alert
       v-if="apiError"
       v-model="apiError"
@@ -8,41 +8,40 @@
       type="warning"
       transition="fade-transition"
     >
-      {{ apiError.code }} {{ apiError.name }}: {{ apiError.message }}
+      {{ apiError.email }} {{ apiError.name }}: {{ apiError.message }}
     </v-alert>
     <form>
       <v-text-field
-        v-model="course.code"
+        v-model="doctor.email"
         v-validate="{
           required: true,
           regex:/[A-Z]{2,5}\s\d{3}[A-Z]?/,
           unique: {
-            course_id: course.id
+            doctor_id: doctor.id
           }
         }"
         :counter="10"
-        :error-messages="errors.collect('code')"
-        label="Doctor ID"
-        data-vv-name="code"
+        :error-messages="errors.collect('email')"
+        label="Doctor"
+        data-vv-name="email"
         data-vv-validate-on="change"
         required
       ></v-text-field>
       <v-text-field
-        v-model="course.title"
+        v-model="doctor.password"
         v-validate="'required|max:35'"
         :counter="35"
-        :error-messages="errors.collect('title')"
-        label="Course Title (e.g. Software Development)"
-        data-vv-name="title"
+        :error-messages="errors.collect('password')"
+        label="Doctor Password (e.g. Software Development)"
+        data-vv-name="password"
         required
       ></v-text-field>
       <v-select
         v-validate="'required'"
-        :items="difficulties"
-        v-model="course.difficulty"
-        :error-messages="errors.collect('difficulty')"
-        label="Course Difficulty"
-        data-vv-name="difficulty"
+        v-model="doctor.id"
+        :error-messages="errors.collect('id')"
+        label="Doctor ID"
+        data-vv-name="id"
         required
       ></v-select>
       <v-btn :disabled="!edited" @click="submit" class="secondary">Submit</v-btn>
@@ -52,47 +51,23 @@
       <v-flex xs6>
         <v-card>
           <v-toolbar color="secondary" dark>
-            <v-toolbar-title>Students</v-toolbar-title>
+            <v-toolbar-title>Patients</v-toolbar-title>
           </v-toolbar>
           <v-list two-line>
-            <template v-for="student in course.students">
+            <template v-for="patient in doctor.patients">
               <v-list-tile
-                :key="student.id"
+                :key="patient.id"
                 avatar
-                @click="$router.push('/students/' + student.id)"
+                @click="$router.push('/patients/' + patient.id)"
               >
                 <v-list-tile-avatar>
                   <v-icon>school</v-icon>
                 </v-list-tile-avatar>
                 <v-list-tile-content>
-                  <v-list-tile-title v-html="`${student.first_name} ${student.last_name}`"></v-list-tile-title>
+                  <v-list-tile-title v-html="`${patient.first_name} ${patient.last_name}`"></v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <v-divider :key="student.id + 'd'"></v-divider>
-            </template>
-          </v-list>
-        </v-card>
-      </v-flex>
-      <v-flex xs6>
-        <v-card>
-          <v-toolbar color="secondary" dark>
-            <v-toolbar-title>Subjects</v-toolbar-title>
-          </v-toolbar>
-          <v-list two-line>
-            <template v-for="subject in course.subjects">
-              <v-list-tile
-                :key="subject.id"
-                avatar
-                @click="$router.push('/subjects/' + subject.id)"
-              >
-                <v-list-tile-avatar>
-                  <v-icon>school</v-icon>
-                </v-list-tile-avatar>
-                <v-list-tile-content>
-                  <v-list-tile-title v-html="subject.code"></v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-divider :key="subject.id + 'd'"></v-divider>
+              <v-divider :key="patient.id + 'd'"></v-divider>
             </template>
           </v-list>
         </v-card>
@@ -104,55 +79,54 @@
 
 <script>
 // import the necessary database service functions
-import { getCourse, getCourses, updateCourse } from "@/services/courses";
-// configure the Course component (i.e. this page)
+import { getDoctor, getDoctors, updateDoctor } from "@/services/doctors";
+// configure the Doctor component (i.e. this page)
 export default {
-  name: "Course",
+  name: "Doctor",
   // variables defined for use in our template
   data: () => ({
-    // the 'course' is a default blank course object that
+    // the 'doctor' is a default blank doctor object that
     // receive the values in the form so we can create a 
-    // new course in the database
-    course: {
-      code: "",
-      title: "",
-      difficulty: null
+    // new doctor in the database
+    doctor: {
+      email: "",
+      password: "",
+      id: null
     },
     // this variable will be populated if there is an error
     // when we try to submit something to the database, but
     // it defaults to `null`
     apiError: null,
     // these are the values that show up in the dropdown
-    // menu for Course Difficulty
-    difficulties: ["Beginner", "Intermediate", "Advanced"],
+    // menu for Doctor ID
     // the 'dictionary' provides additional configuration info
     // to Vee Validate, including customized error messages
     dictionary: {
       // the 'attributes' tells Vee Validate to use the prettier
       // string to refer to the form field in error messages
       attributes: {
-        code: "Course Code",
-        title: "Course Title",
-        difficulty: "Course Difficulty"
+        email: "Doctor Email",
+        password: "Doctor Password",
+        id: "Doctor ID"
       },
       // the 'custom' property is where we define custom error
       // messages; most of the time this is not strictly
       // necessary as Vee Validate comes with useful default
       // error messages out of the box.
       custom: {
-        code: {
+        email: {
           regex: () => {
             return (
-              `The Course Code must be ALL-CAPS, start with a
+              `The Doctor Email must be ALL-CAPS, start with a
                2-5 character department identifier (e.g. ISAT),
                followed by a space, followed by a 3-digit number,
                followed optionally by a single letter (e.g. "H"
-               for honors courses).`
+               for honors doctors).`
             );
           }
         },
-        title: {
-          max: "The Course Title can be at most 35 characters long."
+        password: {
+          max: "The Doctor Password can be at most 35 characters long."
         }
       }
     }
@@ -168,57 +142,57 @@ export default {
       const valid = await this.$validator.validateAll();
       // if everthing is okay...
       if (valid) {
-        try { // try to update the course in the database
-          const course = await updateCourse(this.course.id, this.course);
-          // then redirect back to the Courses page with
+        try { // try to update the doctor in the database
+          const doctor = await updateDoctor(this.doctor.id, this.doctor);
+          // then redirect back to the Doctors page with
           // a success message
           this.$router.replace({
-            name: "courses",
+            name: "doctors",
             query: {
               status: "success",
-              message: `Success! The course "${course.code}: ` +
-                `${course.title}" has been updated!`
+              message: `Success! The doctor "${doctor.email}: ` +
+                `${doctor.password}" has been updated!`
             }
           });
         } catch(err) {
-          // uh-oh! there was a problem creating the course
+          // uh-oh! there was a problem creating the doctor
           this.apiError = err;
         }
       }
     }
   },
   async mounted() {
-    // load the course
+    // load the doctor
     try {
-      this.course = await getCourse(this.$route.params.id);
+      this.doctor = await getDoctor(this.$route.params.id);
     } catch(err) {
       this.apiError = err;
     }
     // tell Vee Validate to use our custom dictionary
     this.$validator.localize("en", this.dictionary);
     // below is a custom validator that will check the database
-    // to make sure that the Course Code is unique BEFORE we are
+    // to make sure that the Doctor Email is unique BEFORE we are
     // allowed to submit this form; using custom validators like
     // this is an advanced technique but can greatly improve the
     // user experience as well as the data integrity of your app.
     this.$validator.extend("unique", {
       getMessage: field => 
         `This ${field} already exists in the database. It must be unique.`,
-      validate(value, {course_id}) {
-        // query the database for a course with the code entered in the form.
-        // if the number of returned results is NOT zero, then a course with
-        // this code already exists in the database and we should return false.
-        return getCourses({
+      validate(value, {doctor_id}) {
+        // query the database for a doctor with the email entered in the form.
+        // if the number of returned results is NOT zero, then a doctor with
+        // this email already exists in the database and we should return false.
+        return getDoctors({
           query: {
-            code: value,
-            id: { $ne: course_id } // exclude the current course from the query
+            email: value,
+            id: { $ne: doctor_id } // exclude the current doctor from the query
           }
         })
         .then(res => res.data.length === 0);
       }
     }, {
       immediate: false,
-      paramNames: ["course_id"]
+      paramNames: ["doctor_id"]
     });
   },
   // initialize Vee Validate
