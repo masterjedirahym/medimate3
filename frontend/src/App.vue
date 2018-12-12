@@ -37,7 +37,7 @@
       <router-view/>
     </v-content>
     <v-footer app fixed inset>
-      <span>&copy; 2018 Morgan C. Benton, All rights reserved.</span>
+      <span>&copy; 2018 MediMate, All rights reserved.</span>
     </v-footer>
   </v-app>
 </template>
@@ -50,7 +50,7 @@ export default {
       drawer: false,
       routes: this.$router.options.routes,
       miniVariant: false,
-      title: "HTTC"
+      title: "MediMate"
     }
   }
 }

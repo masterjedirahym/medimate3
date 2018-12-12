@@ -1,6 +1,6 @@
 <template>
   <div class="container page">
-    <h1>Courses</h1>
+    <h1>Doctors</h1>
     <v-alert
       v-if="alert"
       v-model="alert"
@@ -13,7 +13,7 @@
     <p>
       <v-btn large color="secondary" :to="'/courses/new'">
         <v-icon left dark>add</v-icon>
-        Add New Course
+        Add New Doctor
       </v-btn>
     </p>
     <v-card>
@@ -78,7 +78,7 @@
             <v-select
               v-model="student"
               class="item"
-              label="Pick a Student"
+              label="Pick a Patient"
               item-text="name"
               item-value="id"
               item-key="id"

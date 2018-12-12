@@ -22,7 +22,7 @@
         }"
         :counter="10"
         :error-messages="errors.collect('code')"
-        label="Course Code (e.g. ISAT 340)"
+        label="Doctor ID"
         data-vv-name="code"
         data-vv-validate-on="change"
         required
