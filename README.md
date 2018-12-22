@@ -57,3 +57,7 @@ This is a critical piece of understanding for modern data architectures as **alm
   * [A Beginner's Tutorial for Understanding REST APIs](https://mlsdev.com/blog/81-a-beginner-s-tutorial-for-understanding-restful-api)
   * [REST API Tutorial](https://www.restapitutorial.com/index.html)
   * [How to design a REST API](https://restfulapi.net/rest-api-design-tutorial-with-example/)
+
+## Acknowledgements
+
+We would like to thank Dr. Benton for all of the assistance and feedback that he provided throughout the duration of the course and the development of the project.   
