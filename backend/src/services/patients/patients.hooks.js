@@ -41,10 +41,10 @@ module.exports = {
       // get all doctors related to this patient
       async function(context) {
         // write our sql
-        const sql = `SELECT c.id, c.code
-                     FROM   doctor_patient cs, doctors c
-                     WHERE  cs.doctor_id = c.id AND
-                            cs.patient_id = ?`;
+        const sql = `SELECT d.id, d.email
+                     FROM   doctor_patient dp, doctors d
+                     WHERE  dp.doctor_id = d.id AND
+                            dp.patient_id = ?`;
         // get the knex db client
         const knex = context.app.get('knexClient');
         // run our query
